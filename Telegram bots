@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, ContextTypes
 
-TOKEN = "5889727085:AAHGcKmVfe6tDtBRlAc6ZjfU9rSrKOfPYHk"
+TOKEN = "6660568243:AAG2PwqTGBFapScGjvQH-gT0t2B_N7mRVVMfrd0"
 OWNER_ID = 5261225274  # ID الخاص بك
 
 async def notify_owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
