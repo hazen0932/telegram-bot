@@ -1,0 +1,56 @@
+import asyncio
+from telegram import Update
+from telegram.ext import Application, MessageHandler, filters, ContextTypes
+
+# 📌 بيانات البوتات + المالك
+OWNER_ID = 5261225274
+BOTS = [
+    "832497738:AAF7H33ifOlgyXjlJXPQPI0Rfj-5H2R48c0",
+    "6388201141:AAG7exDCssOrK9yuO-T0t2B_N7mRVVMfrd0",
+    "6660568243:AAG2PwqTGBFapScGjvQH-gT0t2B_N7mRVVMfrd0",
+    "6813048951:AAG3BS58Y-l6nkcZWdgC-DRnpI58NEEZjck",
+    "6830256324:AAGAjOj2DP0BjKXo4hH_XZR_Lu0ogGFFReA",
+]
+
+async def notify_owner(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """دالة لإرسال بيانات أي مستخدم يكتب رسالة إلى المالك"""
+    user = update.effective_user
+    message = update.message.text if update.message else "❌ بدون رسالة"
+
+    first_name = user.first_name or "بدون اسم"
+    last_name = user.last_name or ""
+    username = f"@{user.username}" if user.username else "❌ لا يوجد يوزر"
+    user_id = user.id
+
+    text = (
+        "🚨 مستخدم تواصل مع البوت\n\n"
+        f"👤 الاسم: {first_name} {last_name}\n"
+        f"🔗 اليوزر: {username}\n"
+        f"🆔 ID: {user_id}\n"
+        f"💬 الرسالة: {message}"
+    )
+
+    # يرسل لك أنت فقط (المالك)
+    try:
+        await context.bot.send_message(chat_id=OWNER_ID, text=text)
+    except Exception as e:
+        print(f"خطأ أثناء إرسال الإشعار: {e}")
+
+def create_app(token: str):
+    """إنشاء تطبيق لبوت واحد"""
+    app = Application.builder().token(token).build()
+    handler = MessageHandler(filters.TEXT & ~filters.COMMAND, notify_owner)
+    app.add_handler(handler)
+
+    # مهم جدًا: حتى رسائل /start تصل للمالك
+    app.add_handler(MessageHandler(filters.COMMAND, notify_owner))
+    return app
+
+async def main():
+    """تشغيل جميع البوتات في وقت واحد"""
+    apps = [create_app(token) for token in BOTS]
+    await asyncio.gather(*(app.run_polling() for app in apps))
+
+if __name__ == "__main__":
+    print("🤖 جميع البوتات تعمل الآن... في انتظار الرسائل")
+    asyncio.run(main())
